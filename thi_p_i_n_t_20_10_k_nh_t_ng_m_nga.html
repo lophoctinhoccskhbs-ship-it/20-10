@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Ngày Phụ Nữ Việt Nam 20/10 - Kính Tặng Mẹ Nga Yêu Quý</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts hỗ trợ tiếng Việt tuyệt đẹp -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        script: ['"Dancing Script"', 'cursive'],
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Quicksand"', 'sans-serif'],
+                    },
+                    colors: {
+                        pearl: '#FFF9FB',
+                        blush: '#FCE4EC',
+                        roseGold: '#D84B78',
+                        ruby: '#9E2A52',
+                        gold: '#D4AF37',
+                        goldLight: '#F7E7A9',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background: radial-gradient(circle at center, #fff9fb 0%, #fde2ec 50%, #f5b8cd 100%);
+            min-height: 100vh;
+            font-family: 'Quicksand', sans-serif;
+            color: #4a2030;
+        }
+
+        /* 2 lớp Canvas cho cánh hoa rơi và hiệu ứng bắn tim/hoa */
+        #bg-canvas, #fx-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        #bg-canvas { z-index: 1; }
+        #fx-canvas { z-index: 40; }
+
+        /* ================= HIỆU ỨNG PHONG BÌ 3D MẸ NGA ================= */
+        .envelope-scene {
+            perspective: 1200px;
+            cursor: pointer;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .envelope-scene:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .envelope {
+            position: relative;
+            width: 340px;
+            height: 235px;
+            background: linear-gradient(135deg, #e05380 0%, #9e2a52 100%);
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 25px 55px -12px rgba(145, 30, 70, 0.45), 0 0 28px rgba(212, 175, 55, 0.35);
+            transform-style: preserve-3d;
+        }
+
+        @media (min-width: 640px) {
+            .envelope {
+                width: 430px;
+                height: 285px;
+            }
+        }
+
+        /* Nắp phong bì trên */
+        .flap-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #e6628c 0%, #b8325e 100%);
+            clip-path: polygon(0 0, 100% 0, 50% 58%);
+            transform-origin: top;
+            transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.2s 0.4s;
+            z-index: 30;
+            border-top: 2px solid #f9d5e2;
+            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+        }
+
+        .flap-top::after {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            clip-path: polygon(0 0, 100% 0, 50% 56%);
+            border-top: 1px dashed rgba(255, 245, 220, 0.75);
+        }
+
+        /* Nắp trái, phải, dưới */
+        .flap-left {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #dc527e 0%, #c93b69 100%);
+            clip-path: polygon(0 0, 52% 52%, 0 100%);
+            z-index: 20;
+            border-radius: 0 0 0 16px;
+        }
+
+        .flap-right {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(-90deg, #d44875 0%, #bf3460 100%);
+            clip-path: polygon(100% 0, 48% 52%, 100% 100%);
+            z-index: 21;
+            border-radius: 0 0 16px 0;
+        }
+
+        .flap-bottom {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, #a82853 0%, #dc527e 100%);
+            clip-path: polygon(0 100%, 50% 46%, 100% 100%);
+            z-index: 22;
+            border-radius: 0 0 16px 16px;
+            box-shadow: inset 0 -4px 14px rgba(0,0,0,0.12);
+        }
+
+        /* Thẻ thư nhô lên từ trong phong bì */
+        .letter-preview {
+            position: absolute;
+            left: 6%;
+            right: 6%;
+            bottom: 8%;
+            height: 86%;
+            background: linear-gradient(to bottom, #fffdf9, #fff0f5);
+            border-radius: 12px;
+            z-index: 10;
+            border: 2px solid #d4af37;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            text-align: center;
+        }
+
+        /* Con dấu sáp vàng 20/10 MẸ NGA */
+        .wax-seal {
+            position: absolute;
+            top: 54%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff0b3, #d4af37 60%, #967015 100%);
+            box-shadow: 0 6px 18px rgba(90, 20, 45, 0.45), inset 0 2px 6px rgba(255, 255, 255, 0.8), inset 0 -3px 6px rgba(100, 70, 0, 0.6);
+            z-index: 35;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(120, 80, 10, 0.65);
+            transition: transform 0.45s ease, opacity 0.45s ease;
+            animation: pulse-glow 2.2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.65), 0 6px 18px rgba(90, 20, 45, 0.45);
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(212, 175, 55, 0), 0 8px 22px rgba(90, 20, 45, 0.55);
+                transform: translate(-50%, -50%) scale(1.06);
+            }
+        }
+
+        /* Trạng thái khi mở phong bì */
+        .envelope.open .flap-top {
+            transform: rotateX(180deg);
+            z-index: 5;
+        }
+        .envelope.open .wax-seal {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+        .envelope.open .letter-preview {
+            transform: translateY(-130px) scale(1.04);
+            z-index: 25;
+        }
+
+        /* ================= THIẾT KẾ TẤM THIỆP CHÍNH ================= */
+        .greeting-card {
+            background: linear-gradient(145deg, #fffefb 0%, #fff7fa 55%, #fde8f0 100%);
+            border-radius: 26px;
+            box-shadow: 
+                0 25px 65px -15px rgba(158, 42, 82, 0.35),
+                0 0 0 1.5px rgba(212, 175, 55, 0.45),
+                inset 0 0 40px rgba(255, 218, 232, 0.65);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Khung viền mạ vàng bên trong thiệp */
+        .gold-frame {
+            position: absolute;
+            inset: 12px;
+            border: 1.5px solid rgba(212, 175, 55, 0.65);
+            border-radius: 18px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .gold-frame::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px dashed rgba(212, 175, 55, 0.45);
+            border-radius: 14px;
+        }
+
+        /* Con trỏ gõ chữ */
+        .typing-cursor::after {
+            content: '|';
+            display: inline-block;
+            color: #d84b78;
+            font-weight: bold;
+            margin-left: 2px;
+            animation: blink 0.75s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Hiệu ứng nút bấm sang trọng */
+        .luxury-btn {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .luxury-btn:hover {
+            transform: translateY(-3px);
+        }
+        .luxury-btn:active {
+            transform: translateY(0px) scale(0.97);
+        }
+
+        /* Nút chọn chủ đề lời chúc cho Mẹ Nga */
+        .wish-tab {
+            transition: all 0.25s ease;
+        }
+        .wish-tab.active {
+            background: linear-gradient(135deg, #d84b78, #9e2a52);
+            color: #ffffff;
+            border-color: #d4af37;
+            box-shadow: 0 4px 14px rgba(216, 75, 120, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Đĩa nhạc xoay */
+        .spin-slow {
+            animation: spin 8s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hoa bay lơ lửng nhẹ */
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(2deg); }
+        }
+        .float-bouquet {
+            animation: gentleFloat 3.6s ease-in-out infinite;
+        }
+
+        /* Banner "Con yêu Mẹ Nga!" bay lên */
+        @keyframes floatUpBouquet {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 60px) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, 0px) scale(1.06);
+            }
+            30% {
+                transform: translate(-50%, 4px) scale(1);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -18px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -65px) scale(0.85);
+            }
+        }
+        .bouquet-toast {
+            animation: floatUpBouquet 3.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Thanh cuộn tinh tế */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(216, 75, 120, 0.35);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="relative flex flex-col items-center justify-center min-h-screen py-6 px-3 sm:px-6">
+
+    <!-- Canvas 1: Cánh hoa hồng, hoa cẩm chướng & kim tuyến vàng rơi -->
+    <canvas id="bg-canvas"></canvas>
+    <!-- Canvas 2: Pháo hoa Tim & Hoa khi bấm Tặng Hoa cho Mẹ Nga -->
+    <canvas id="fx-canvas"></canvas>
+
+    <!-- Nút Bật/Tắt nhạc góc phải trên -->
+    <div class="fixed top-4 right-4 z-50 flex items-center gap-2">
+        <button id="music-toggle-btn" onclick="toggleMusic()" class="luxury-btn flex items-center gap-2.5 bg-white/90 backdrop-blur-md border border-amber-300 text-rose-900 px-4 py-2.5 rounded-full shadow-lg hover:bg-white">
+            <div id="music-icon-wrapper" class="w-7 h-7 rounded-full bg-gradient-to-tr from-rose-600 to-amber-400 text-white flex items-center justify-center shadow-sm">
+                <i id="music-icon" class="fa-solid fa-music text-xs"></i>
+            </div>
+            <span id="music-status-text" class="text-xs sm:text-sm font-semibold tracking-wide pr-1">Nhạc nền: Tắt</span>
+        </button>
+    </div>
+
+    <!-- ==========================================
+         MÀN HÌNH 1: PHONG BÌ THƯ 3D KÍNH TẶNG MẸ NGA
+    =========================================== -->
+    <section id="envelope-screen" class="relative z-20 flex flex-col items-center justify-center text-center transition-all duration-700 my-auto">
+        <!-- Huy hiệu ngày lễ 20/10 phía trên -->
+        <div class="mb-5 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-sm border border-amber-300/80 shadow-sm">
+            <span class="text-amber-500 text-sm"><i class="fa-solid fa-crown"></i></span>
+            <span class="text-xs sm:text-sm font-bold uppercase tracking-widest text-rose-900">Ngày Phụ Nữ Việt Nam 20/10 • Kính Tặng Mẹ Nga</span>
+            <span class="text-amber-500 text-sm"><i class="fa-solid fa-heart text-rose-500"></i></span>
+        </div>
+
+        <h1 class="font-script text-4xl sm:text-6xl text-rose-800 drop-shadow-sm mb-2.5 px-2">
+            Gửi Mẹ Nga Yêu Quý Của Con
+        </h1>
+        <p class="text-rose-950/80 text-sm sm:text-base max-w-md mb-9 px-4 font-medium">
+            Món quà tinh thần nhỏ gói trọn lòng hiếu thảo và tình yêu thương vô bờ con dành tặng riêng Mẹ Nga nhân ngày 20/10.
+        </p>
+
+        <!-- Phong bì 3D tương tác -->
+        <div class="envelope-scene" onclick="openGreetingCard()" role="button" tabindex="0" aria-label="Chạm để mở thiệp 20/10 tặng Mẹ Nga">
+            <div id="main-envelope" class="envelope">
+                <!-- Nắp trên -->
+                <div class="flap-top"></div>
+                <!-- Nắp trái, phải, dưới -->
+                <div class="flap-left"></div>
+                <div class="flap-right"></div>
+                <div class="flap-bottom"></div>
+
+                <!-- Thiệp bên trong nhô lên -->
+                <div class="letter-preview">
+                    <span class="font-serif italic text-amber-700 text-xs sm:text-sm tracking-widest uppercase mb-1">Happy Vietnamese Women's Day 20/10</span>
+                    <h2 class="font-script text-2xl sm:text-3xl text-rose-700 font-bold">Kính tặng Mẹ Nga yêu quý</h2>
+                    <div class="w-20 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent my-2"></div>
+                    <p class="text-xs sm:text-sm text-rose-900/80 font-semibold">Người phụ nữ tuyệt vời nhất của con ❤️</p>
+                </div>
+
+                <!-- Con dấu sáp vàng 20/10 MẸ NGA -->
+                <div class="wax-seal">
+                    <div class="text-center leading-tight">
+                        <span class="font-serif font-bold text-sm text-rose-950 block tracking-tight">20/10</span>
+                        <i class="fa-solid fa-heart text-rose-700 text-[10px] my-0.5 block"></i>
+                        <span class="font-sans font-extrabold text-[10px] text-amber-950 tracking-wider block">MẸ NGA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút nhắc nhấp mở -->
+        <button onclick="openGreetingCard()" class="mt-10 group flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-gradient-to-r from-rose-700 via-pink-600 to-amber-500 text-white font-bold text-sm sm:text-base shadow-xl shadow-rose-500/35 hover:shadow-rose-600/50 transition-all hover:scale-105">
+            <i class="fa-regular fa-envelope-open animate-bounce"></i>
+            <span>Chạm để mở thiệp tặng Mẹ Nga</span>
+        </button>
+    </section>
+
+    <!-- ==========================================
+         MÀN HÌNH 2: TẤM THIỆP CHÍNH DÀNH TẶNG MẸ NGA
+    =========================================== -->
+    <main id="card-screen" class="relative z-20 hidden opacity-0 scale-95 transition-all duration-700 w-full max-w-2xl mx-auto my-auto">
+        
+        <!-- Thẻ thiệp chính (Nhấp vào thiệp cũng bắn tim nhẹ) -->
+        <article id="main-card-article" class="greeting-card px-5 py-7 sm:px-11 sm:py-9">
+            <!-- Viền vàng trang trí -->
+            <div class="gold-frame"></div>
+
+            <!-- Hoa văn 4 góc SVG -->
+            <svg class="w-12 h-12 sm:w-16 sm:h-16 text-amber-500/70 absolute top-4 left-4 pointer-events-none" viewBox="0 0 100 100" fill="none">
+                <path d="M5 95 L5 25 Q5 5 25 5 L95 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M14 75 L14 28 Q14 14 28 14 L75 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="25" cy="25" r="4" fill="currentColor"/>
+            </svg>
+            <svg class="w-12 h-12 sm:w-16 sm:h-16 text-amber-500/70 absolute top-4 right-4 pointer-events-none transform scale-x-[-1]" viewBox="0 0 100 100" fill="none">
+                <path d="M5 95 L5 25 Q5 5 25 5 L95 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M14 75 L14 28 Q14 14 28 14 L75 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="25" cy="25" r="4" fill="currentColor"/>
+            </svg>
+            <svg class="w-12 h-12 sm:w-16 sm:h-16 text-amber-500/70 absolute bottom-4 left-4 pointer-events-none transform scale-y-[-1]" viewBox="0 0 100 100" fill="none">
+                <path d="M5 95 L5 25 Q5 5 25 5 L95 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M14 75 L14 28 Q14 14 28 14 L75 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="25" cy="25" r="4" fill="currentColor"/>
+            </svg>
+            <svg class="w-12 h-12 sm:w-16 sm:h-16 text-amber-500/70 absolute bottom-4 right-4 pointer-events-none transform scale-[-1]" viewBox="0 0 100 100" fill="none">
+                <path d="M5 95 L5 25 Q5 5 25 5 L95 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M14 75 L14 28 Q14 14 28 14 L75 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="25" cy="25" r="4" fill="currentColor"/>
+            </svg>
+
+            <!-- Phần Đầu Thiệp: Huy hiệu & Bó Hoa Hồng + Cẩm Chướng Tặng Mẹ Nga -->
+            <div class="relative z-10 flex flex-col items-center text-center">
+                <!-- Huy hiệu phát sáng -->
+                <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-gradient-to-r from-rose-700 via-pink-600 to-rose-700 text-white text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-md mb-3">
+                    <i class="fa-solid fa-sparkles text-amber-300"></i>
+                    <span>Ngày Phụ Nữ Việt Nam 20/10 • Kính Tặng Mẹ Nga</span>
+                    <i class="fa-solid fa-sparkles text-amber-300"></i>
+                </div>
+
+                <!-- Minh họa bó hoa hồng & cẩm chướng nghệ thuật bằng SVG -->
+                <div class="float-bouquet w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-b from-pink-100/90 to-amber-50/80 border-2 border-amber-300/80 flex items-center justify-center shadow-inner mb-2">
+                    <svg class="w-20 h-20 sm:w-24 sm:h-24 drop-shadow-sm" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Giấy gói hoa lụa hồng kem -->
+                        <path d="M36 66 L60 112 L84 66 Z" fill="#F48FB1" stroke="#AD1457" stroke-width="1.5"/>
+                        <path d="M26 56 L60 105 L94 56 Q60 70 26 56 Z" fill="#FCE4EC" stroke="#C2185B" stroke-width="1.5"/>
+                        <!-- Lá xanh tươi -->
+                        <path d="M35 52 Q18 40 27 28 Q42 34 46 50 Z" fill="#66BB6A"/>
+                        <path d="M85 52 Q102 40 93 28 Q78 34 74 50 Z" fill="#4CAF50"/>
+                        <path d="M60 30 Q60 12 72 18 Q68 30 60 36 Z" fill="#81C784"/>
+                        <!-- Hoa cẩm chướng trái (Tượng trưng cho tình Mẹ) -->
+                        <circle cx="43" cy="48" r="14" fill="#EC407A"/>
+                        <path d="M36 45 Q43 36 50 45 Q43 54 36 45" stroke="#FFF0F5" stroke-width="2" stroke-linecap="round"/>
+                        <!-- Hoa cẩm chướng phải -->
+                        <circle cx="77" cy="48" r="14" fill="#F06292"/>
+                        <path d="M70 45 Q77 36 84 45 Q77 54 70 45" stroke="#FFF0F5" stroke-width="2" stroke-linecap="round"/>
+                        <!-- Bông hồng đỏ thắm trung tâm -->
+                        <circle cx="60" cy="37" r="17" fill="#D81B60"/>
+                        <path d="M52 35 Q60 25 68 35 Q60 45 52 35" stroke="#FCE4EC" stroke-width="2.3" stroke-linecap="round"/>
+                        <circle cx="60" cy="35" r="5" fill="#F8BBD0"/>
+                        <!-- Nơ ruy băng vàng kim -->
+                        <path d="M47 86 Q60 94 73 86" stroke="#D4AF37" stroke-width="4.5" stroke-linecap="round"/>
+                        <circle cx="60" cy="88" r="5" fill="#B68D1C"/>
+                    </svg>
+                </div>
+
+                <!-- Tiêu đề chính chúc mừng Mẹ Nga -->
+                <h1 class="font-script text-3xl sm:text-5xl font-bold bg-gradient-to-r from-rose-800 via-pink-600 to-amber-600 bg-clip-text text-transparent py-1">
+                    Chúc Mừng 20/10 Mẹ Nga Yêu Quý
+                </h1>
+
+                <p class="font-serif italic text-rose-900/90 text-sm sm:text-lg mt-0.5 px-2">
+                    “Cảm ơn Mẹ vì cả cuộc đời tần tảo, dịu dàng và che chở cho con”
+                </p>
+
+                <!-- Đường kẻ hoa văn vàng -->
+                <div class="flex items-center justify-center gap-3 w-full my-3">
+                    <div class="h-px w-20 sm:w-32 bg-gradient-to-r from-transparent to-amber-400"></div>
+                    <i class="fa-solid fa-heart text-rose-500 text-xs"></i>
+                    <div class="h-px w-20 sm:w-32 bg-gradient-to-l from-transparent to-amber-400"></div>
+                </div>
+            </div>
+
+            <!-- 4 Tabs Chủ Đề Lời Chúc Dành Riêng Cho Mẹ Nga -->
+            <div class="relative z-10 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mb-4 px-1" id="wish-tabs-container">
+                <button onclick="selectWishTab(0)" class="wish-tab active text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full border border-rose-200 bg-white/90 text-rose-900 shadow-sm">
+                    💖 Lời chúc ấm áp
+                </button>
+                <button onclick="selectWishTab(1)" class="wish-tab text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full border border-rose-200 bg-white/90 text-rose-900 shadow-sm">
+                    🌿 Sức khỏe & Bình an
+                </button>
+                <button onclick="selectWishTab(2)" class="wish-tab text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full border border-rose-200 bg-white/90 text-rose-900 shadow-sm">
+                    🌸 Thơ tặng Mẹ Nga
+                </button>
+                <button onclick="selectWishTab(3)" class="wish-tab text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full border border-rose-200 bg-white/90 text-rose-900 shadow-sm">
+                    🏡 Gia đình hạnh phúc
+                </button>
+            </div>
+
+            <!-- Phần Thân Thiệp: Người nhận & Lời chúc chạy chữ -->
+            <div class="relative z-10 mb-4 px-1 sm:px-5">
+                <div class="flex items-center justify-between mb-2">
+                    <p id="card-recipient" class="font-serif font-bold italic text-xl sm:text-2xl text-rose-900">
+                        Kính gửi Mẹ Nga yêu thương nhất của con,
+                    </p>
+                    <button onclick="finishTypingImmediately()" id="skip-typing-btn" class="text-xs underline text-amber-700 hover:text-rose-700 font-semibold shrink-0 ml-2">
+                        Hiện nhanh
+                    </button>
+                </div>
+
+                <!-- Khung chứa chữ chạy Typewriter -->
+                <div class="min-h-[145px] sm:min-h-[140px] max-h-[240px] overflow-y-auto custom-scroll bg-white/80 border border-rose-200/90 rounded-2xl p-4 sm:p-5 shadow-inner flex items-center justify-center">
+                    <p id="typewriter-text" class="text-rose-950 text-base sm:text-lg leading-relaxed font-medium text-left whitespace-pre-line typing-cursor w-full"></p>
+                </div>
+
+                <!-- Câu ca dao & Chữ ký của Con -->
+                <div class="mt-4 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                    <div class="bg-amber-50/90 border-l-4 border-amber-400 pl-3 py-1.5 pr-3 rounded-r-lg text-left">
+                        <p class="font-serif italic text-xs sm:text-sm text-amber-950">
+                            “Đi khắp thế gian không ai tốt bằng Mẹ,<br>Gánh nặng cuộc đời không ai khổ bằng Cha.”
+                        </p>
+                    </div>
+
+                    <div class="text-right">
+                        <p class="text-[11px] text-rose-800/75 uppercase tracking-wider font-bold">Người gửi lời thương</p>
+                        <p id="card-sender" class="font-script text-2xl sm:text-3xl text-rose-700 font-bold mt-0.5">
+                            — Con trai yêu của Mẹ Nga —
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- ==========================================
+             THANH CÔNG CỤ TƯƠNG TÁC BÊN DƯỚI THIỆP
+        =========================================== -->
+        <div class="mt-5 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 px-2">
+            <!-- Nút Tặng Hoa & Bắn Tim Cho Mẹ Nga -->
+            <button onclick="sendFlowersForMeNga()" class="luxury-btn flex items-center gap-2 bg-gradient-to-r from-rose-700 via-pink-600 to-amber-500 text-white font-bold px-5 py-2.5 sm:px-6 sm:py-3 rounded-full shadow-lg shadow-rose-400/45 text-xs sm:text-sm">
+                <i class="fa-solid fa-heart-pulse animate-bounce"></i>
+                <span>💐 Tặng Hoa & Bắn Tim Cho Mẹ Nga (<span id="flower-counter">0</span>)</span>
+            </button>
+
+            <!-- Nút Đổi lời chúc khác -->
+            <button onclick="cycleNextWish()" class="luxury-btn flex items-center gap-2 bg-white hover:bg-rose-50 text-rose-800 border border-rose-300 font-semibold px-4 py-2.5 sm:px-5 sm:py-3 rounded-full shadow-md text-xs sm:text-sm">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                <span>✨ Đổi lời chúc khác</span>
+            </button>
+
+            <!-- Nút Sửa lời nhắn riêng -->
+            <button onclick="openCustomModal()" class="luxury-btn flex items-center gap-2 bg-white hover:bg-amber-50 text-amber-900 border border-amber-300 font-semibold px-4 py-2.5 sm:px-5 sm:py-3 rounded-full shadow-md text-xs sm:text-sm">
+                <i class="fa-solid fa-pen-nib text-rose-600"></i>
+                <span>✍️ Sửa lời nhắn riêng</span>
+            </button>
+
+            <!-- Nút Sao chép lời chúc -->
+            <button onclick="copyCurrentWish()" class="luxury-btn flex items-center gap-2 bg-white/95 hover:bg-white text-rose-900 border border-rose-200 font-semibold px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full shadow-md text-xs sm:text-sm" title="Sao chép lời chúc">
+                <i class="fa-regular fa-copy text-rose-600"></i>
+                <span>📋 Sao chép lời chúc</span>
+            </button>
+
+            <!-- Nút Gấp lại phong bì -->
+            <button onclick="closeCardToEnvelope()" class="luxury-btn flex items-center gap-1.5 bg-rose-900/10 hover:bg-rose-900/20 text-rose-900 font-semibold px-3.5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm" title="Gấp lại phong bì">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- ==========================================
+         MODAL SỬA LỜI NHẮN RIÊNG TẶNG MẸ NGA
+    =========================================== -->
+    <div id="custom-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-rose-950/55 backdrop-blur-sm p-4">
+        <div class="bg-pearl border-2 border-amber-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+            <!-- Nút đóng -->
+            <button onclick="closeCustomModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-rose-100 hover:bg-rose-200 text-rose-800 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-2.5 mb-4">
+                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center">
+                    <i class="fa-solid fa-heart text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif font-bold text-2xl text-rose-900 leading-tight">Viết Lời Thương Gửi Mẹ Nga</h3>
+                    <p class="text-xs text-rose-700/80">Tùy chỉnh lời chào, lời chúc 20/10 và chữ ký của riêng bạn</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Nhập lời chào Mẹ Nga -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rose-900 mb-1">Lời mở đầu gửi Mẹ Nga:</label>
+                    <input id="input-recipient" type="text" placeholder="VD: Kính gửi Mẹ Nga yêu thương nhất của con," 
+                        class="w-full px-4 py-2.5 rounded-xl border border-rose-200 bg-white focus:outline-none focus:ring-2 focus:ring-rose-400 text-rose-950 text-sm font-medium select-text">
+                </div>
+
+                <!-- Chọn nhanh mẫu gợi ý -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rose-900 mb-1">Chọn nhanh mẫu lời chúc tặng Mẹ Nga:</label>
+                    <select id="preset-select" onchange="selectPresetInModal(this.value)"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-amber-300 bg-amber-50/60 text-rose-900 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <option value="">-- Chọn một mẫu lời chúc có sẵn --</option>
+                    </select>
+                </div>
+
+                <!-- Nội dung lời chúc -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rose-900 mb-1">Nội dung lời chúc 20/10:</label>
+                    <textarea id="input-message" rows="4" placeholder="Nhập lời chúc chân thành gửi tới Mẹ Nga..."
+                        class="w-full px-4 py-2.5 rounded-xl border border-rose-200 bg-white focus:outline-none focus:ring-2 focus:ring-rose-400 text-rose-950 text-sm font-medium select-text"></textarea>
+                </div>
+
+                <!-- Tên người gửi -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-rose-900 mb-1">Chữ ký của Con:</label>
+                    <input id="input-sender" type="text" placeholder="VD: — Con trai yêu của Mẹ Nga —" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-rose-200 bg-white focus:outline-none focus:ring-2 focus:ring-rose-400 text-rose-950 text-sm font-medium select-text">
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center justify-end gap-3">
+                <button onclick="closeCustomModal()" class="px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-rose-800 hover:bg-rose-100 transition">
+                    Hủy
+                </button>
+                <button onclick="applyCustomWish()" class="luxury-btn px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-rose-700 to-amber-500 shadow-lg shadow-rose-300/50">
+                    <i class="fa-solid fa-check mr-1.5"></i> Lưu Lên Thiệp Mẹ Nga
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container hiển thị huy hiệu "Con yêu Mẹ Nga!" bay lên & thông báo Toast -->
+    <div id="floating-bouquet-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+    <div id="toast-notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden bg-rose-900/95 text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full shadow-xl backdrop-blur-md"></div>
+
+    <script>
+        /* =========================================================================
+           1. BỘ SƯU TẬP LỜI CHÚC 20/10 DÀNH RIÊNG CHO MẸ NGA
+        ========================================================================= */
+        const meNgaWishes = [
+            {
+                tabName: "💖 Lời chúc ấm áp",
+                recipient: "Kính gửi Mẹ Nga yêu thương nhất của con,",
+                message: "Nhân ngày Phụ nữ Việt Nam 20/10, con xin gửi tới Mẹ Nga ngàn lời yêu thương và lòng biết ơn sâu sắc nhất! Cảm ơn Mẹ vì cả cuộc đời tần tảo, hy sinh thầm lặng để nuôi nấng và chở che cho con. Con chúc Mẹ Nga ngày 20/10 và mỗi ngày trong năm đều ngập tràn niềm vui, luôn nở nụ cười rạng rỡ và mãi là điểm tựa ấm áp nhất của con!",
+                sender: "— Con trai yêu của Mẹ Nga —"
+            },
+            {
+                tabName: "🌿 Sức khỏe & Bình an",
+                recipient: "Thương gửi Mẹ Nga kính yêu của con,",
+                message: "Ngày 20/10 năm nay, điều ước lớn nhất của con là mong Mẹ Nga luôn thật nhiều sức khỏe, tâm hồn thảnh thơi và bình an mỗi ngày. Những tháng năm vất vả đã qua rồi, giờ là lúc Mẹ Nga nghỉ ngơi, tận hưởng niềm vui và để con được chăm sóc, báo hiếu Mẹ thật nhiều. Con thương Mẹ Nga nhiều lắm!",
+                sender: "— Con trai yêu của Mẹ Nga —"
+            },
+            {
+                tabName: "🌸 Thơ tặng Mẹ Nga",
+                recipient: "Kính tặng Mẹ Nga vần thơ từ trái tim con,",
+                message: "Hai mươi tháng Mười nắng nở hoa,\nCon dâng ngàn đóa tặng Mẹ Nga.\nCảm ơn tần tảo đời sương gió,\nChúc Mẹ bình an, mãi trẻ ra!\n\nChúc Mẹ Nga của con luôn tươi trẻ, yêu đời và hạnh phúc vẹn tròn!",
+                sender: "— Con trai yêu của Mẹ Nga —"
+            },
+            {
+                tabName: "🏡 Gia đình hạnh phúc",
+                recipient: "Gửi Mẹ Nga — Trái tim của gia đình mình,",
+                message: "Có Mẹ Nga là có tổ ấm bình yên, có những bữa cơm ấm nóng và tiếng cười rộn rã. Nhân ngày tôn vinh Phụ nữ Việt Nam 20/10, con kính chúc Mẹ Nga luôn mạnh khỏe, trẻ đẹp, vạn sự như ý và mãi mãi hạnh phúc bên gia đình thân yêu của chúng ta!",
+                sender: "— Con trai yêu của Mẹ Nga —"
+            }
+        ];
+
+        let currentWishIndex = 0;
+        let typewriterTimer = null;
+        let currentFullText = "";
+        let currentCharIndex = 0;
+        let flowerCount = 0;
+
+        /* =========================================================================
+           2. HIỆU ỨNG MỞ PHONG BÌ 3D & CHUYỂN TAB LỜI CHÚC MẸ NGA
+        ========================================================================= */
+        function populatePresetDropdown() {
+            const select = document.getElementById('preset-select');
+            meNgaWishes.forEach((item, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `${item.tabName}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function openGreetingCard() {
+            const envelope = document.getElementById('main-envelope');
+            const envScreen = document.getElementById('envelope-screen');
+            const cardScreen = document.getElementById('card-screen');
+
+            if (envelope.classList.contains('open')) return;
+            envelope.classList.add('open');
+
+            // Tự động bật giai điệu hộp nhạc ấm áp khi mở thiệp
+            if (!isPlayingMusic) {
+                startMusicBox();
+            }
+
+            // Bắn pháo hoa trái tim & hoa chào mừng Mẹ Nga
+            spawnCelebrationParticles(window.innerWidth / 2, window.innerHeight / 2, 42);
+
+            setTimeout(() => {
+                envScreen.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+                setTimeout(() => {
+                    envScreen.classList.add('hidden');
+                    cardScreen.classList.remove('hidden');
+                    void cardScreen.offsetWidth;
+                    cardScreen.classList.remove('opacity-0', 'scale-95');
+                    cardScreen.classList.add('opacity-100', 'scale-100');
+
+                    // Hiển thị lời chúc đầu tiên cho Mẹ Nga
+                    selectWishTab(0);
+                }, 420);
+            }, 950);
+        }
+
+        function closeCardToEnvelope() {
+            const envelope = document.getElementById('main-envelope');
+            const envScreen = document.getElementById('envelope-screen');
+            const cardScreen = document.getElementById('card-screen');
+
+            if (typewriterTimer) clearTimeout(typewriterTimer);
+
+            cardScreen.classList.remove('opacity-100', 'scale-100');
+            cardScreen.classList.add('opacity-0', 'scale-95');
+
+            setTimeout(() => {
+                cardScreen.classList.add('hidden');
+                envScreen.classList.remove('hidden');
+                envelope.classList.remove('open');
+                void envScreen.offsetWidth;
+                envScreen.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
+            }, 500);
+        }
+
+        function updateActiveTabUI(activeIndex) {
+            const buttons = document.querySelectorAll('#wish-tabs-container .wish-tab');
+            buttons.forEach((btn, idx) => {
+                if (idx === activeIndex) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function selectWishTab(index) {
+            currentWishIndex = index;
+            updateActiveTabUI(index);
+            renderWish(index);
+            playChimeNote(659.25, 450);
+        }
+
+        function renderWish(index, customData = null) {
+            const wish = customData || meNgaWishes[index];
+            document.getElementById('card-recipient').textContent = wish.recipient;
+            document.getElementById('card-sender').textContent = wish.sender;
+
+            startTypewriterEffect(wish.message);
+        }
+
+        function startTypewriterEffect(text) {
+            if (typewriterTimer) clearTimeout(typewriterTimer);
+            const target = document.getElementById('typewriter-text');
+            const skipBtn = document.getElementById('skip-typing-btn');
+            
+            target.textContent = "";
+            target.classList.add('typing-cursor');
+            skipBtn.classList.remove('hidden');
+
+            currentFullText = text;
+            currentCharIndex = 0;
+
+            function typeStep() {
+                if (currentCharIndex < currentFullText.length) {
+                    const char = currentFullText.charAt(currentCharIndex);
+                    target.textContent += char;
+                    currentCharIndex++;
+
+                    let delay = 25;
+                    if (char === ',' || char === ';') delay = 120;
+                    if (char === '.' || char === '!' || char === '\n') delay = 220;
+
+                    typewriterTimer = setTimeout(typeStep, delay);
+                } else {
+                    target.classList.remove('typing-cursor');
+                    skipBtn.classList.add('hidden');
+                }
+            }
+
+            typeStep();
+        }
+
+        function finishTypingImmediately() {
+            if (typewriterTimer) clearTimeout(typewriterTimer);
+            const target = document.getElementById('typewriter-text');
+            target.textContent = currentFullText;
+            target.classList.remove('typing-cursor');
+            document.getElementById('skip-typing-btn').classList.add('hidden');
+        }
+
+        function cycleNextWish() {
+            const nextIdx = (currentWishIndex + 1) % meNgaWishes.length;
+            selectWishTab(nextIdx);
+        }
+
+        /* =========================================================================
+           3. MODAL TÙY CHỈNH LỜI NHẮN & SAO CHÉP
+        ========================================================================= */
+        function openCustomModal() {
+            const current = meNgaWishes[currentWishIndex];
+            document.getElementById('input-recipient').value = document.getElementById('card-recipient').textContent;
+            document.getElementById('input-message').value = currentFullText || current.message;
+            document.getElementById('input-sender').value = document.getElementById('card-sender').textContent;
+
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCustomModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function selectPresetInModal(idx) {
+            if (idx === "") return;
+            const chosen = meNgaWishes[Number(idx)];
+            document.getElementById('input-recipient').value = chosen.recipient;
+            document.getElementById('input-message').value = chosen.message;
+            document.getElementById('input-sender').value = chosen.sender;
+        }
+
+        function applyCustomWish() {
+            const recipient = document.getElementById('input-recipient').value.trim() || "Kính gửi Mẹ Nga yêu thương nhất của con,";
+            const message = document.getElementById('input-message').value.trim() || meNgaWishes[0].message;
+            const sender = document.getElementById('input-sender').value.trim() || "— Con trai yêu của Mẹ Nga —";
+
+            closeCustomModal();
+            updateActiveTabUI(-1);
+            renderWish(0, { recipient, message, sender });
+            spawnCelebrationParticles(window.innerWidth / 2, window.innerHeight / 2, 40);
+            showToast("Đã cập nhật lời nhắn riêng dành tặng Mẹ Nga!");
+        }
+
+        function copyCurrentWish() {
+            const recipient = document.getElementById('card-recipient').textContent;
+            const sender = document.getElementById('card-sender').textContent;
+            const fullContent = `${recipient}\n\n${currentFullText}\n\n${sender}`;
+
+            const tempArea = document.createElement('textarea');
+            tempArea.value = fullContent;
+            document.body.appendChild(tempArea);
+            tempArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Đã sao chép lời chúc 20/10 tặng Mẹ Nga vào bộ nhớ tạm!");
+            } catch (err) {
+                showToast("Không thể sao chép tự động, vui lòng thử lại.");
+            }
+            document.body.removeChild(tempArea);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            toast.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2800);
+        }
+
+        /* =========================================================================
+           4. WEB AUDIO API: GIAI ĐIỆU HỘP NHẠC RU ÊM ÁI ("LÒNG MẸ" INSPIRED)
+        ========================================================================= */
+        let audioCtx = null;
+        let isPlayingMusic = false;
+        let melodyScheduler = null;
+        let noteStep = 0;
+
+        // Giai điệu ngũ cung trữ tình ấm áp gợi nhớ tình Mẹ bao la
+        const lullabyScore = [
+            { f: 392.00, d: 650, bass: 196.00 }, // G4
+            { f: 440.00, d: 500, bass: 220.00 }, // A4
+            { f: 523.25, d: 900, bass: 261.63 }, // C5
+            { f: 587.33, d: 550, bass: 293.66 }, // D5
+            { f: 659.25, d: 750, bass: 164.81 }, // E5
+            { f: 587.33, d: 500, bass: 196.00 }, // D5
+            { f: 523.25, d: 1100, bass: 130.81 }, // C5
+
+            { f: 440.00, d: 600, bass: 174.61 }, // A4
+            { f: 523.25, d: 550, bass: 220.00 }, // C5
+            { f: 587.33, d: 700, bass: 196.00 }, // D5
+            { f: 523.25, d: 550, bass: 164.81 }, // C5
+            { f: 440.00, d: 600, bass: 174.61 }, // A4
+            { f: 392.00, d: 1150, bass: 196.00 }, // G4
+
+            { f: 329.63, d: 600, bass: 130.81 }, // E4
+            { f: 392.00, d: 550, bass: 196.00 }, // G4
+            { f: 440.00, d: 700, bass: 220.00 }, // A4
+            { f: 523.25, d: 650, bass: 261.63 }, // C5
+            { f: 440.00, d: 550, bass: 174.61 }, // A4
+            { f: 392.00, d: 600, bass: 196.00 }, // G4
+            { f: 523.25, d: 1400, bass: 130.81 }  // C5 ngân ấm
+        ];
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playChimeNote(freq, durationMs = 900, bassFreq = null) {
+            try {
+                initAudioContext();
+                const now = audioCtx.currentTime;
+                const dur = durationMs / 1000;
+
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(freq, now);
+
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(freq * 2, now);
+
+                const overtoneGain = audioCtx.createGain();
+                overtoneGain.gain.setValueAtTime(0.028, now);
+
+                gainNode.gain.setValueAtTime(0.0001, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.11, now + 0.035);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + dur * 1.5);
+
+                osc1.connect(gainNode);
+                osc2.connect(overtoneGain);
+                overtoneGain.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + dur * 1.55);
+                osc2.stop(now + dur * 1.55);
+
+                if (bassFreq) {
+                    const bassOsc = audioCtx.createOscillator();
+                    const bassGain = audioCtx.createGain();
+                    bassOsc.type = 'sine';
+                    bassOsc.frequency.setValueAtTime(bassFreq, now);
+
+                    bassGain.gain.setValueAtTime(0.0001, now);
+                    bassGain.gain.exponentialRampToValueAtTime(0.045, now + 0.05);
+                    bassGain.gain.exponentialRampToValueAtTime(0.0001, now + dur * 1.7);
+
+                    bassOsc.connect(bassGain);
+                    bassGain.connect(audioCtx.destination);
+
+                    bassOsc.start(now);
+                    bassOsc.stop(now + dur * 1.75);
+                }
+            } catch (e) {
+                // Bỏ qua nếu trình duyệt chặn tự động phát
+            }
+        }
+
+        function scheduleNextNote() {
+            if (!isPlayingMusic) return;
+            const note = lullabyScore[noteStep];
+            playChimeNote(note.f, note.d, note.bass);
+
+            noteStep = (noteStep + 1) % lullabyScore.length;
+            melodyScheduler = setTimeout(scheduleNextNote, note.d);
+        }
+
+        function startMusicBox() {
+            initAudioContext();
+            isPlayingMusic = true;
+            updateMusicButtonUI();
+            if (melodyScheduler) clearTimeout(melodyScheduler);
+            scheduleNextNote();
+        }
+
+        function stopMusicBox() {
+            isPlayingMusic = false;
+            if (melodyScheduler) clearTimeout(melodyScheduler);
+            updateMusicButtonUI();
+        }
+
+        function toggleMusic() {
+            if (isPlayingMusic) {
+                stopMusicBox();
+            } else {
+                startMusicBox();
+            }
+        }
+
+        function updateMusicButtonUI() {
+            const statusText = document.getElementById('music-status-text');
+            const wrapper = document.getElementById('music-icon-wrapper');
+            if (isPlayingMusic) {
+                statusText.textContent = "Nhạc nền: Đang phát";
+                wrapper.classList.add('spin-slow');
+            } else {
+                statusText.textContent = "Nhạc nền: Tắt";
+                wrapper.classList.remove('spin-slow');
+            }
+        }
+
+        /* =========================================================================
+           5. CANVAS 1: CÁNH HOA HỒNG, CẨM CHƯỚNG & KIM TUYẾN VÀNG RƠI
+        ========================================================================= */
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        const fxCanvas = document.getElementById('fx-canvas');
+        const fxCtx = fxCanvas.getContext('2d');
+        let bgParticles = [];
+
+        function resizeCanvases() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+            fxCanvas.width = window.innerWidth;
+            fxCanvas.height = window.innerHeight;
+        }
+
+        class FallingPetal {
+            constructor(initialRandomY = false) {
+                this.reset(initialRandomY);
+            }
+
+            reset(initialRandomY = false) {
+                this.x = Math.random() * bgCanvas.width;
+                this.y = initialRandomY ? Math.random() * bgCanvas.height : -30;
+                const rand = Math.random();
+                this.type = rand < 0.55 ? 'rose' : (rand < 0.82 ? 'carnation' : 'sparkle');
+                this.size = this.type === 'sparkle' ? Math.random() * 3 + 1.5 : Math.random() * 9 + 7;
+                this.speedY = Math.random() * 0.9 + 0.45;
+                this.speedX = (Math.random() - 0.5) * 0.7;
+                this.angle = Math.random() * Math.PI * 2;
+                this.spinSpeed = (Math.random() - 0.5) * 0.025;
+                this.swayStep = Math.random() * 100;
+                this.opacity = Math.random() * 0.45 + 0.45;
+
+                const roseColors = ['#f48fb1', '#ec407a', '#f8bbd0', '#d81b60'];
+                const carnationColors = ['#ff80ab', '#f06292', '#fce4ec'];
+                this.color = this.type === 'rose'
+                    ? roseColors[Math.floor(Math.random() * roseColors.length)]
+                    : carnationColors[Math.floor(Math.random() * carnationColors.length)];
+            }
+
+            update() {
+                this.swayStep += 0.02;
+                this.y += this.speedY;
+                this.x += this.speedX + Math.sin(this.swayStep) * 0.45;
+                this.angle += this.spinSpeed;
+
+                if (this.y > bgCanvas.height + 30) {
+                    this.reset(false);
+                }
+                if (this.x > bgCanvas.width + 30) this.x = -20;
+                if (this.x < -30) this.x = bgCanvas.width + 20;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.globalAlpha = this.opacity;
+
+                if (this.type === 'rose') {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size * 0.6);
+                    ctx.bezierCurveTo(this.size * 0.85, -this.size * 0.6, this.size * 0.9, this.size * 0.5, 0, this.size * 0.85);
+                    ctx.bezierCurveTo(-this.size * 0.9, this.size * 0.5, -this.size * 0.85, -this.size * 0.6, 0, -this.size * 0.6);
+                    ctx.fill();
+                } else if (this.type === 'carnation') {
+                    // Cánh hoa cẩm chướng viền lượn sóng mềm
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    const flicker = 0.4 + Math.abs(Math.sin(this.swayStep * 2)) * 0.6;
+                    ctx.globalAlpha = flicker;
+                    ctx.fillStyle = '#f3d060';
+                    ctx.shadowColor = '#d4af37';
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        function initBgParticles() {
+            const count = window.innerWidth < 640 ? 34 : 56;
+            bgParticles = [];
+            for (let i = 0; i < count; i++) {
+                bgParticles.push(new FallingPetal(true));
+            }
+        }
+
+        /* =========================================================================
+           6. CANVAS 2: PHÁO HOA TRÁI TIM & HUY HIỆU "CON YÊU MẸ NGA!"
+        ========================================================================= */
+        let burstParticles = [];
+
+        class HeartFireworkParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 6.8 + 2.2;
+                this.vx = Math.cos(angle) * velocity;
+                this.vy = Math.sin(angle) * velocity - 2.3;
+                this.gravity = 0.12;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.014 + 0.01;
+                this.size = Math.random() * 9 + 6;
+                this.isHeart = Math.random() > 0.22;
+                const palette = ['#e11d48', '#f43f5e', '#ec4899', '#f59e0b', '#d4af37'];
+                this.color = palette[Math.floor(Math.random() * palette.length)];
+                this.rotation = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                this.vx *= 0.98;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+
+            draw(ctx) {
+                if (this.alpha <= 0) return;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.globalAlpha = Math.max(this.alpha, 0);
+                ctx.fillStyle = this.color;
+
+                if (this.isHeart) {
+                    const s = this.size * 0.065;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 3 * s);
+                    ctx.bezierCurveTo(0, 0, -5 * s, 0, -5 * s, 3 * s);
+                    ctx.bezierCurveTo(-5 * s, 6 * s, 0, 8 * s, 0, 11 * s);
+                    ctx.bezierCurveTo(0, 8 * s, 5 * s, 6 * s, 5 * s, 3 * s);
+                    ctx.bezierCurveTo(5 * s, 0, 0, 0, 0, 3 * s);
+                    ctx.fill();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.35, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        function spawnCelebrationParticles(x, y, amount = 45) {
+            for (let i = 0; i < amount; i++) {
+                burstParticles.push(new HeartFireworkParticle(x, y));
+            }
+        }
+
+        function sendFlowersForMeNga() {
+            flowerCount++;
+            document.getElementById('flower-counter').textContent = flowerCount;
+
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            spawnCelebrationParticles(w * 0.28, h * 0.45, 38);
+            spawnCelebrationParticles(w * 0.72, h * 0.45, 38);
+            setTimeout(() => {
+                spawnCelebrationParticles(w * 0.5, h * 0.32, 52);
+            }, 200);
+
+            // Hợp âm chuông vui tươi
+            playChimeNote(523.25, 400);
+            setTimeout(() => playChimeNote(659.25, 400), 100);
+            setTimeout(() => playChimeNote(783.99, 750), 200);
+
+            showFloatingMeNgaBanner();
+        }
+
+        function showFloatingMeNgaBanner() {
+            const container = document.getElementById('floating-bouquet-container');
+            const tributes = [
+                { icon: "💐", title: "Con yêu Mẹ Nga nhiều lắm!", sub: "Chúc Mẹ Nga 20/10 luôn rạng rỡ, mạnh khỏe và hạnh phúc ❤️" },
+                { icon: "🌷", title: "Kính tặng Mẹ Nga ngàn đóa hoa!", sub: "Người phụ nữ tuyệt vời và dịu dàng nhất trong lòng con 🌸" },
+                { icon: "💖", title: "Mãi bên Mẹ Nga yêu quý!", sub: "Cảm ơn Mẹ vì tất cả tình yêu thương bao la dành cho con ✨" }
+            ];
+            const pick = tributes[flowerCount % tributes.length];
+
+            const bouquetEl = document.createElement('div');
+            bouquetEl.className = "bouquet-toast fixed bottom-16 left-1/2 z-50 flex flex-col items-center pointer-events-none w-max max-w-[92vw]";
+            bouquetEl.innerHTML = `
+                <div class="bg-white/95 backdrop-blur-md border-2 border-amber-300 rounded-3xl px-5 py-3.5 sm:px-6 sm:py-4 shadow-2xl flex items-center gap-3.5">
+                    <span class="text-3xl sm:text-5xl">${pick.icon}</span>
+                    <div class="text-left">
+                        <p class="font-script text-2xl sm:text-3xl font-bold text-rose-700 leading-none">${pick.title}</p>
+                        <p class="text-xs text-amber-900 font-semibold mt-1">${pick.sub}</p>
+                    </div>
+                </div>
+            `;
+            container.appendChild(bouquetEl);
+            setTimeout(() => {
+                bouquetEl.remove();
+            }, 3600);
+        }
+
+        /* Nhấp vào vùng trống trên thiệp cũng bắn tim nhẹ */
+        document.getElementById('main-card-article').addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            spawnCelebrationParticles(e.clientX, e.clientY, 22);
+        });
+
+        /* =========================================================================
+           7. VÒNG LẶP ANIMATION CHÍNH
+        ========================================================================= */
+        function animateLoop() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            for (let i = 0; i < bgParticles.length; i++) {
+                bgParticles[i].update();
+                bgParticles[i].draw(bgCtx);
+            }
+
+            fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+            for (let i = burstParticles.length - 1; i >= 0; i--) {
+                burstParticles[i].update();
+                burstParticles[i].draw(fxCtx);
+                if (burstParticles[i].alpha <= 0) {
+                    burstParticles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animateLoop);
+        }
+
+        window.onload = function () {
+            resizeCanvases();
+            initBgParticles();
+            populatePresetDropdown();
+            animateLoop();
+
+            window.addEventListener('resize', () => {
+                resizeCanvases();
+            });
+        };
+    </script>
+</body>
+</html>
+```
+
+### Những điểm đặc biệt dành riêng cho **Mẹ Nga** trong phiên bản này:
+1. **Phong bì 3D & Con dấu sáp vàng `20/10 • MẸ NGA`**: Ngay từ màn hình chờ, tấm thiệp bên trong phong bì đã hiện dòng chữ *"Kính tặng Mẹ Nga yêu quý — Người phụ nữ tuyệt vời nhất của con"*.
+2. **4 Chủ đề lời chúc & thơ viết riêng cho Mẹ Nga**:
+   - **💖 Lời chúc ấm áp**: Tri ân sự tần tảo, hy sinh của Mẹ Nga.
+   - **🌿 Sức khỏe & Bình an**: Cầu chúc Mẹ Nga luôn mạnh khỏe, an nhàn.
+   - **🌸 Thơ tặng Mẹ Nga**: Bài thơ 4 câu gieo vần trực tiếp với tên **Mẹ Nga** nhân ngày 20/10.
+   - **🏡 Gia đình hạnh phúc**: Tôn vinh Mẹ Nga là trái tim giữ lửa cho tổ ấm.
+3. **Hiệu ứng "💐 Tặng Hoa & Bắn Tim Cho Mẹ Nga"**: Mỗi lần nhấn nút (hoặc chạm vào thiệp) sẽ kích hoạt pháo hoa trái tim cùng các thông điệp *"Con yêu Mẹ Nga nhiều lắm!"* bay lên kèm âm thanh hộp nhạc du dương.
